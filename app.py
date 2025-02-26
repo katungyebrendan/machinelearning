@@ -21,22 +21,25 @@ if input_method == "Upload CSV":
         st.write("Data Preview:")
         st.write(df.head())
         
-        # Check if the CSV has exactly 5 columns corresponding to the expected features
-        if df.shape[1] != 5:
-            st.error("Error: CSV file must have exactly 5 columns corresponding to the features: Tick, Cape, Cattle, Bio5, and Cluster.")
+        # Check if the CSV has exactly 4 columns corresponding to the expected features
+        if df.shape[1] != 4:
+            st.error("Error: CSV file must have exactly 4 columns corresponding to the features: Tick, Cape, Cattle, and Bio5.")
         else:
             # Let user decide whether to use the teacher model
             use_teacher_model = st.checkbox("Use Teacher Model", value=False)
             if st.button("Predict for All Rows"):
                 results = []
                 for idx, row in df.iterrows():
-                    features = row.tolist()
+                    features = row.tolist()  # Only 4 features: tick, cape, cattle, bio5
                     payload = {"features": features, "use_teacher_model": use_teacher_model}
-                    response = requests.post(FASTAPI_PREDICT_URL, json=payload)
-                    if response.status_code == 200:
-                        results.append(response.json())
-                    else:
-                        st.error(f"Row {idx} Error: {response.text}")
+                    try:
+                        response = requests.post(FASTAPI_PREDICT_URL, json=payload)
+                        if response.status_code == 200:
+                            results.append(response.json())
+                        else:
+                            st.error(f"Row {idx} Error: {response.text}")
+                    except requests.exceptions.ConnectionError as e:
+                        st.error(f"Connection Error: Unable to connect to the FastAPI server. Please ensure the server is running.")
                 if results:
                     st.subheader("Prediction Results")
                     st.write(pd.DataFrame(results))
@@ -48,20 +51,22 @@ elif input_method == "Manual Input":
     cape = st.number_input("Cape", value=0.0)
     cattle = st.number_input("Cattle", value=0.0)
     bio5 = st.number_input("Bio5", value=0.0)
-    cluster = st.number_input("Cluster", value=0.0)  # If the cluster is generated automatically, you might omit this field
     
     use_teacher_model = st.checkbox("Use Teacher Model", value=False)
     
     if st.button("Predict"):
         # Assemble the features in the order the model expects
-        features = [tick, cape, cattle, bio5, cluster]
+        features = [tick, cape, cattle, bio5]  # Only 4 features
         payload = {"features": features, "use_teacher_model": use_teacher_model}
-        response = requests.post(FASTAPI_PREDICT_URL, json=payload)
-        if response.status_code == 200:
-            result = response.json()
-            st.success("Prediction Successful!")
-            st.write("**Prediction:**", result.get("prediction", "N/A"))
-            st.write("**Confidence:**", result.get("confidence", "N/A"))
-            st.write("**Model used:**", result.get("model_used", "N/A"))
-        else:
-            st.error(f"Error: {response.text}")
+        try:
+            response = requests.post(FASTAPI_PREDICT_URL, json=payload)
+            if response.status_code == 200:
+                result = response.json()
+                st.success("Prediction Successful!")
+                st.write("**Prediction:**", result.get("prediction", "N/A"))
+                st.write("**Confidence:**", result.get("confidence", "N/A"))
+                st.write("**Model used:**", result.get("model_used", "N/A"))
+            else:
+                st.error(f"Error: {response.text}")
+        except requests.exceptions.ConnectionError as e:
+            st.error(f"Connection Error: Unable to connect to the FastAPI server. Please ensure the server is running.")
