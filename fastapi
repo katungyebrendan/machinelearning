@@ -3,7 +3,6 @@ import torch
 import joblib
 import mlflow.pytorch
 from pydantic import BaseModel
-
 # Load your GNN model (e.g., the student model for this example)
 MODEL_URI = "models:/student_model/Production"  # or use torch.load if saved locally
 model = mlflow.pytorch.load_model(MODEL_URI)
