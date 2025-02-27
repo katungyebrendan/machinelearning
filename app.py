@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 # FastAPI prediction endpoint URL
-FASTAPI_PREDICT_URL = "https://eastcoast-fastapi.onrender.com/predict"
+FASTAPI_PREDICT_URL = "https://api-1-xax0.onrender.com/predict"
 
 st.title("East Coast Fever Detection")
 st.write("Upload your cow health data or enter features manually to get prediction results.")
