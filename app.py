@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 # FastAPI prediction endpoint URL
-FASTAPI_PREDICT_URL = "https://tiknet-b2da88db-b95a-449b-9752.ahumain.cranecloud.io"
+FASTAPI_PREDICT_URL = "https://eastcoast-1.onrender.com"
 
 st.title("East Coast Fever Detection")
 st.write("Upload your cow health data or enter features manually to get prediction results.")
